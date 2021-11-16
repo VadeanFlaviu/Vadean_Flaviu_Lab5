@@ -11,6 +11,19 @@
         <CollectionViewSource x:Key="customerViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoLotModel:Customer}, CreateList=True}"/>
         <CollectionViewSource x:Key="inventoryViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoLotModel:Inventory}, CreateList=True}"/>
         <CollectionViewSource x:Key="customerOrdersViewSource" Source="{Binding Orders, Source={StaticResource customerViewSource}}"/>
+        <ControlTemplate x:Key="validationTemplate">
+            <DockPanel>
+                <TextBlock Foreground="Red" FontSize="20">!</TextBlock>
+                <AdornedElementPlaceholder/>
+            </DockPanel>
+        </ControlTemplate>
+        <Style x:Key="textBoxInError" TargetType="{x:Type TextBox}">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self},Path=(Validation.Errors)/ErrorContent}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Grid>
         <TabControl x:Name="tbCtrlAutoLot" HorizontalAlignment="Left" Height="322" Margin="27,41,0,0" VerticalAlignment="Top" Width="738" SelectionChanged="TabItemChanged_Click">
@@ -40,14 +53,29 @@
                         <Label Content="Cust Id:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="0" VerticalAlignment="Center"/>
                         <TextBox x:Name="custIdTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="0" Text="{Binding CustId, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120" IsEnabled="False"/>
                         <Label Content="First Name:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="1" VerticalAlignment="Center"/>
-                        <TextBox x:Name="firstNameTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="1" Text="{Binding FirstName, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
+                        <TextBox x:Name="firstNameTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="1" Text="{Binding FirstName, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}"/>
                         <Label Content="Last Name:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="2" VerticalAlignment="Center"/>
-                        <TextBox x:Name="lastNameTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="2" Text="{Binding LastName, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
+                        <TextBox x:Name="lastNameTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="2" Text="{Binding LastName, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120" Validation.ErrorTemplate="{StaticResource validationTemplate}" Style="{StaticResource textBoxInError}"/>
                     </Grid>
                     <Button x:Name="btnNew" Content="New" HorizontalAlignment="Left" Margin="27,31,0,0" VerticalAlignment="Top" Width="75" Click="btnNew_Click" Grid.ColumnSpan="2" Background="{x:Null}"/>
                     <Button x:Name="btnEdit" Content="Edit" HorizontalAlignment="Left" Margin="27,75,0,0" VerticalAlignment="Top" Width="75" Click="btnEdit_Click" Grid.ColumnSpan="2"/>
                     <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Left" Margin="27,111,0,0" VerticalAlignment="Top" Width="75" Click="btnDelete_Click" Grid.ColumnSpan="2"/>
-                    <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="27,215,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click" Grid.ColumnSpan="2"/>
+                    <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="27,215,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click" Grid.ColumnSpan="2">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="IsEnabled" Value="false" />
+                                <Style.Triggers>
+                                    <!--Butonul Save va fi inactiv daca exista erori de validare -->
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ElementName=lastNameTextBox, Path=(Validation.HasError)}" Value="false" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="IsEnabled" Value="true" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="27,250,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click" Grid.ColumnSpan="2"/>
                     <Button x:Name="btnPrev" Content="Previous" HorizontalAlignment="Left" Margin="238,131,0,0" VerticalAlignment="Top" Width="75" Click="btnPrevious_Click" Grid.Column="1"/>
                     <Button x:Name="btnNext" Content="Next" HorizontalAlignment="Left" Margin="563,131,0,0" VerticalAlignment="Top" Width="75" Click="btnNext_Click" Grid.Column="1"/>

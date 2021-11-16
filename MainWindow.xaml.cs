@@ -100,6 +100,27 @@ namespace Vadean_Flaviu_Lab5
         }
 
         #region Customers Menu
+        private void SetValidationBinding()
+        {
+            Binding firstNameValidationBinding = new Binding();
+            firstNameValidationBinding.Source = customerViewSource;
+            firstNameValidationBinding.Path = new PropertyPath("FirstName");
+            firstNameValidationBinding.NotifyOnValidationError = true;
+            firstNameValidationBinding.Mode = BindingMode.TwoWay;
+            firstNameValidationBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            //string required
+            firstNameValidationBinding.ValidationRules.Add(new StringNotEmpty());
+            firstNameTextBox.SetBinding(TextBox.TextProperty, firstNameValidationBinding);
+            Binding lastNameValidationBinding = new Binding();
+            lastNameValidationBinding.Source = customerViewSource;
+            lastNameValidationBinding.Path = new PropertyPath("LastName");
+            lastNameValidationBinding.NotifyOnValidationError = true;
+            lastNameValidationBinding.Mode = BindingMode.TwoWay;
+            lastNameValidationBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+            //string min length validator
+            lastNameValidationBinding.ValidationRules.Add(new StringMinLengthValidator());
+            lastNameTextBox.SetBinding(TextBox.TextProperty, lastNameValidationBinding); //setare binding nou
+        }
         void EnableElementsOnCustomersUI(ActionState state)
         {
             btnNew.IsEnabled = false;
@@ -150,6 +171,7 @@ namespace Vadean_Flaviu_Lab5
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             Customer customer = null;
+            SetValidationBinding();
             if (action == ActionState.New)
             {
                 try
@@ -230,15 +252,16 @@ namespace Vadean_Flaviu_Lab5
         }
         private void btnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(firstNameTextBox.Text) == false && string.IsNullOrEmpty(lastNameTextBox.Text) == false)
-            {
+            //if (string.IsNullOrEmpty(firstNameTextBox.Text) == false && string.IsNullOrEmpty(lastNameTextBox.Text) == false)
+            //{
                 action = ActionState.Edit;
                 EnableElementsOnCustomersUI(action);
-            }
-            else
-            {
-                MessageBox.Show("Nu ati selectat o inregistrare pe care sa o editati!");
-            }
+                SetValidationBinding();
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Nu ati selectat o inregistrare pe care sa o editati!");
+            //}
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
